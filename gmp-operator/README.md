@@ -4,7 +4,7 @@
  GMP operator allows you to globally monitor and alert on your workloads using Prometheus, all without the hassle of manually managing and operating Prometheus instances. GMP operator automatically scales to handle your data.
 
 ## Prerequisites
-Completed the `prerequisite-workshop`. You have a kind cluster with `prometheus-receiver` setup.
+Completed the `workshop`. You have a kind cluster with `prometheus-receiver` setup.
 
 ## Installing GMP
 1. <b>Install the GMP CRDs(Custom Resource Definitions)</b>:
