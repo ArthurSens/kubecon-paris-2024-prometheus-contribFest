@@ -1,0 +1,776 @@
+# Source: prometheus-engine/templates/priority-class.yaml
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: gmp-critical
+# Maximum allowed user-defined. Only system-node-critical and system-cluster-critical
+# pods are higher.
+value: 1000000000
+description: Used for GMP collector pods.
+---
+# Source: prometheus-engine/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gmp-system
+---
+# Source: prometheus-engine/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gmp-public
+---
+# Source: prometheus-engine/templates/service-account.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: collector
+  namespace: gmp-system
+---
+# Source: prometheus-engine/templates/service-account.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: operator
+  namespace: gmp-system
+---
+# Source: prometheus-engine/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: gmp-system:collector
+rules:
+- resources:
+  - endpoints
+  - nodes
+  - nodes/metrics
+  - pods
+  - services
+  apiGroups: [""]
+  verbs: ["get", "list", "watch"]
+- resources:
+  - configmaps
+  apiGroups: [""]
+  verbs: ["get"]
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
+---
+# Source: prometheus-engine/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: gmp-system:operator
+rules:
+# Resources controlled by the operator.
+- resources:
+  - clusterpodmonitorings
+  - clusterrules
+  - globalrules
+  - clusternodemonitorings
+  - podmonitorings
+  - rules
+  apiGroups: ["monitoring.googleapis.com"]
+  verbs: ["get", "list", "watch"]
+- resources:
+  - clusterpodmonitorings/status
+  - clusterrules/status
+  - globalrules/status
+  - clusternodemonitorings/status
+  - podmonitorings/status
+  - rules/status
+  apiGroups: ["monitoring.googleapis.com"]
+  verbs: ["get", "patch", "update"]
+- resources:
+  - statefulsets
+  apiGroups: ["apps"]
+  verbs: ["get", "list", "watch"]
+---
+# Source: prometheus-engine/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: gmp-system:operator:webhook-admin
+rules:
+# Permission to inject CA bundles into webhook configs of fixed name.
+- resources:
+  - validatingwebhookconfigurations
+  - mutatingwebhookconfigurations
+  apiGroups: ["admissionregistration.k8s.io"]
+  resourceNames:
+  - gmp-operator.gmp-system.monitoring.googleapis.com
+  verbs: ["get", "patch", "update", "watch"]
+# Permission to delete legacy webhook config the operator directly created
+# in previous versions.
+- resources:
+  - validatingwebhookconfigurations
+  - mutatingwebhookconfigurations
+  apiGroups: ["admissionregistration.k8s.io"]
+  resourceNames:
+  - gmp-operator
+  verbs: ["delete"]
+---
+# Source: prometheus-engine/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gmp-system:operator
+roleRef:
+  name: gmp-system:operator
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- name: operator
+  namespace: gmp-system
+  kind: ServiceAccount
+---
+# Source: prometheus-engine/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gmp-system:operator:webhook-admin
+roleRef:
+  name: gmp-system:operator:webhook-admin
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- name: operator
+  namespace: gmp-system
+  kind: ServiceAccount
+---
+# Source: prometheus-engine/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gmp-system:collector
+roleRef:
+  name: gmp-system:collector
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- name: collector
+  namespace: gmp-system
+  kind: ServiceAccount
+---
+# Source: prometheus-engine/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: operator
+  namespace: gmp-system
+rules:
+- resources:
+  - pods
+  apiGroups: [""]
+  verbs: ["list", "watch"]
+- resources:
+  - secrets
+  apiGroups: [""]
+  verbs: ["list", "watch", "create"]
+- resources:
+  - secrets
+  apiGroups: [""]
+  resourceNames: ["collection", "rules", "alertmanager"]
+  verbs: ["get", "patch", "update"]
+- resources:
+  - configmaps
+  apiGroups: [""]
+  verbs: ["list", "watch", "create"]
+- resources:
+  - configmaps
+  apiGroups: [""]
+  resourceNames: ["collector", "rule-evaluator", "rules-generated"]
+  verbs: ["get", "patch", "update"]
+- resources:
+  - daemonsets
+  apiGroups: ["apps"]
+  resourceNames: ["collector"]
+  verbs: ["get", "list", "watch", "patch", "update"]
+- resources:
+  - deployments
+  apiGroups: ["apps"]
+  verbs: ["list", "watch"]
+- resources:
+  - deployments
+  apiGroups: ["apps"]
+  resourceNames: ["rule-evaluator"]
+  verbs: ["get", "patch", "update"]
+- resources:
+  - services
+  apiGroups: [""]
+  resourceNames: ["alertmanager"]
+  verbs: ["get", "list", "watch"]
+- resources:
+  - statefulsets
+  apiGroups: ["apps"]
+  resourceNames: ["alertmanager"]
+  verbs: ["get", "patch", "update"]
+---
+# Source: prometheus-engine/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: operator
+  namespace: gmp-public
+rules:
+- resources:
+  - secrets
+  apiGroups: [""]
+  verbs: ["get", "list", "watch"]
+- resources:
+  - operatorconfigs
+  apiGroups: ["monitoring.googleapis.com"]
+  verbs: ["get", "list", "watch"]
+---
+# Source: prometheus-engine/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: operator
+  namespace: gmp-public
+roleRef:
+  name: operator
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- name: operator
+  namespace: gmp-system
+  kind: ServiceAccount
+---
+# Source: prometheus-engine/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: operator
+  namespace: gmp-system
+roleRef:
+  name: operator
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- name: operator
+  kind: ServiceAccount
+---
+# Source: prometheus-engine/templates/alertmanager.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager
+  namespace: gmp-system
+spec:
+  selector:
+    app: managed-prometheus-alertmanager
+    app.kubernetes.io/name: alertmanager
+  ports:
+  - name: alertmanager
+    port: 9093
+    targetPort: 9093
+  clusterIP: None
+---
+# Source: prometheus-engine/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: gmp-operator
+  namespace: gmp-system
+spec:
+  selector:
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/name: gmp-operator
+    app.kubernetes.io/part-of: gmp
+  ports:
+  # This port does not do anything, but allows upgrades in the case
+  # of server-side apply (SSA) conflicts.
+  # TODO(pintohutch): remove once the SSA issues from upgrades are resolved.
+  - name: legacy
+    protocol: TCP
+    port: 8443
+    targetPort: webhook
+  - name: webhook
+    protocol: TCP
+    port: 443
+    targetPort: web
+---
+# Source: prometheus-engine/templates/collector.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: collector
+  namespace: gmp-system
+spec:
+  selector:
+    matchLabels:
+      # DO NOT MODIFY - label selectors are immutable by the Kubernetes API.
+      # see: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/#pod-selector.
+      app.kubernetes.io/name: collector
+  template:
+    metadata:
+      labels:
+        app: managed-prometheus-collector
+        app.kubernetes.io/name: collector
+        app.kubernetes.io/version: 0.11.0
+      annotations:
+        # The emptyDir for the storage and config directories prevents cluster
+        # autoscaling unless this annotation is set.
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        components.gke.io/component-name: managed_prometheus
+    spec:
+      serviceAccountName: collector
+      automountServiceAccountToken: true
+      priorityClassName: gmp-critical
+      initContainers:
+      - name: config-init
+        image: gke.gcr.io/gke-distroless/bash:20220419
+        command: ['/bin/bash', '-c', 'touch /prometheus/config_out/config.yaml']
+        volumeMounts:
+        - name: config-out
+          mountPath: /prometheus/config_out
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+      containers:
+      - name: config-reloader
+        image: gke.gcr.io/prometheus-engine/config-reloader:v0.9.0-gke.1
+        args:
+        - --config-file=/prometheus/config/config.yaml
+        - --config-file-output=/prometheus/config_out/config.yaml
+        - --reload-url=http://127.0.0.1:19090/-/reload
+        - --ready-url=http://127.0.0.1:19090/-/ready
+        - --listen-address=:19091
+        ports:
+        - name: cfg-rel-metrics
+          containerPort: 19091
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        resources:
+          limits:
+            memory: 32M
+          requests:
+            cpu: 1m
+            memory: 4M
+        volumeMounts:
+        - name: config
+          readOnly: true
+          mountPath: /prometheus/config
+        - name: config-out
+          mountPath: /prometheus/config_out
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+      - name: prometheus
+        image: quay.io/prometheus/prometheus
+        args:
+        - --config.file=/prometheus/config_out/config.yaml
+        - --enable-feature=exemplar-storage
+        - --storage.tsdb.path=/prometheus/data
+        - --storage.tsdb.no-lockfile
+        # Keep 30 minutes of data. As we are backed by an emptyDir volume, this will count towards
+        # the containers memory usage. We could lower it further if this becomes problematic, but
+        # it the window for local data is quite convenient for debugging.
+        - --storage.tsdb.retention.time=30m
+        - --storage.tsdb.wal-compression
+        # Effectively disable compaction and make blocks short enough so that our retention window
+        # can be kept in practice.
+        - --storage.tsdb.min-block-duration=10m
+        - --storage.tsdb.max-block-duration=10m
+        - --web.listen-address=:19090
+        - --web.enable-lifecycle
+        - --web.route-prefix=/
+        # JSON log format is needed for GKE to display log levels correctly.
+        - --log.format=json
+        ports:
+        - name: prom-metrics
+          containerPort: 19090
+        # The environment variable EXTRA_ARGS will be populated by the operator.
+        # DO NOT specify it here.
+        env:
+        - name: GOGC
+          value: "25"
+        resources:
+          limits:
+            memory: 2G
+          requests:
+            cpu: 4m
+            memory: 32M
+        volumeMounts:
+        - name: storage
+          mountPath: /prometheus/data
+        - name: config-out
+          readOnly: true
+          mountPath: /prometheus/config_out
+        - name: collection-secret
+          readOnly: true
+          mountPath: /etc/secrets
+        livenessProbe:
+          httpGet:
+            port: 19090
+            path: /-/healthy
+            scheme: HTTP
+        readinessProbe:
+          httpGet:
+            port: 19090
+            path: /-/ready
+            scheme: HTTP
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+      volumes:
+      - name: storage
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: collector
+      - name: config-out
+        emptyDir: {}
+      - name: collection-secret
+        secret:
+          secretName: collection
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                - arm64
+                - amd64
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+      tolerations:
+      - effect: NoExecute
+        operator: Exists
+      - effect: NoSchedule
+        operator: Exists
+      securityContext:
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+---
+# Source: prometheus-engine/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gmp-operator
+  namespace: gmp-system
+  labels:
+    app: managed-prometheus-operator
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/name: gmp-operator
+    app.kubernetes.io/part-of: gmp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      # DO NOT MODIFY - label selectors are immutable by the Kubernetes API.
+      # see: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#label-selector-updates.
+      app.kubernetes.io/component: operator
+      app.kubernetes.io/name: gmp-operator
+      app.kubernetes.io/part-of: gmp
+  template:
+    metadata:
+      labels:
+        app: managed-prometheus-operator
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/name: gmp-operator
+        app.kubernetes.io/part-of: gmp
+        app.kubernetes.io/version: 0.11.0
+    spec:
+      serviceAccountName: operator
+      automountServiceAccountToken: true
+      priorityClassName: gmp-critical
+      containers:
+      - name: operator
+        image: docker.io/operatorkc24demo/gmp-operator:latest
+        args:
+        - "--project-id=kubecon2024"
+        - "--cluster=kind-kubecon2024-prometheus"
+        - "--operator-namespace=gmp-system"
+        - "--public-namespace=gmp-public"
+        - "--webhook-addr=:10250"
+        ports:
+        - name: web
+          # Note this should match the --listen-addr flag passed in to the operator args.
+          # Default is 10250.
+          containerPort: 10250
+        - name: metrics
+          # Note this should match the --metrics-addr flag passed in to the operator args.
+          # Default is 18080.
+          containerPort: 18080
+        resources:
+          limits:
+            memory: 2G
+          requests:
+            cpu: 1m
+            memory: 16M
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          privileged: false
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                - arm64
+                - amd64
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+      tolerations:
+      - value: "amd64"
+        effect: "NoSchedule"
+        key: "kubernetes.io/arch"
+        operator: "Equal"
+      - value: "arm64"
+        effect: "NoSchedule"
+        key: "kubernetes.io/arch"
+        operator: "Equal"
+      securityContext:
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+---
+# Source: prometheus-engine/templates/mutatingwebhookconfiguration.yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: gmp-operator.gmp-system.monitoring.googleapis.com
+webhooks:
+- name: default.podmonitorings.gmp-operator.gmp-system.monitoring.googleapis.com
+  admissionReviewVersions:
+  - v1
+  clientConfig:
+    # caBundle populated by operator.
+    service:
+      name: gmp-operator
+      namespace: gmp-system
+      port: 443
+      path: /default/monitoring.googleapis.com/v1/podmonitorings
+  failurePolicy: Fail
+  rules:
+  - resources:
+    - podmonitorings
+    apiGroups:
+    - monitoring.googleapis.com
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+  sideEffects: None
+- name: default.clusterpodmonitorings.gmp-operator.gmp-system.monitoring.googleapis.com
+  admissionReviewVersions:
+  - v1
+  clientConfig:
+    # caBundle populated by operator.
+    service:
+      name: gmp-operator
+      namespace: gmp-system
+      port: 443
+      path: /default/monitoring.googleapis.com/v1/clusterpodmonitorings
+  failurePolicy: Fail
+  rules:
+  - resources:
+    - clusterpodmonitorings
+    apiGroups:
+    - monitoring.googleapis.com
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+  sideEffects: None
+---
+# Source: prometheus-engine/templates/operatorconfig.yaml
+apiVersion: monitoring.googleapis.com/v1
+kind: OperatorConfig
+metadata:
+  name: config
+  namespace: gmp-public
+  labels:
+---
+# Source: prometheus-engine/templates/validatingwebhookconfiguration.yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: gmp-operator.gmp-system.monitoring.googleapis.com
+webhooks:
+- name: validate.podmonitorings.gmp-operator.gmp-system.monitoring.googleapis.com
+  admissionReviewVersions:
+  - v1
+  clientConfig:
+    # caBundle populated by operator.
+    service:
+      name: gmp-operator
+      namespace: gmp-system
+      port: 443
+      path: /validate/monitoring.googleapis.com/v1/podmonitorings
+  failurePolicy: Fail
+  rules:
+  - resources:
+    - podmonitorings
+    apiGroups:
+    - monitoring.googleapis.com
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+  sideEffects: None
+- name: validate.clusterpodmonitorings.gmp-operator.gmp-system.monitoring.googleapis.com
+  admissionReviewVersions:
+  - v1
+  clientConfig:
+    # caBundle populated by operator.
+    service:
+      name: gmp-operator
+      namespace: gmp-system
+      port: 443
+      path: /validate/monitoring.googleapis.com/v1/clusterpodmonitorings
+  failurePolicy: Fail
+  rules:
+  - resources:
+    - clusterpodmonitorings
+    apiGroups:
+    - monitoring.googleapis.com
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+  sideEffects: None
+- name: validate.clusternodemonitorings.gmp-operator.gmp-system.monitoring.googleapis.com
+  admissionReviewVersions:
+  - v1
+  clientConfig:
+    # caBundle populated by operator.
+    service:
+      name: gmp-operator
+      namespace: gmp-system
+      port: 443
+      path: /validate/monitoring.googleapis.com/v1/clusternodemonitorings
+  failurePolicy: Fail
+  rules:
+  - resources:
+    - clusternodemonitorings
+    apiGroups:
+    - monitoring.googleapis.com
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+  sideEffects: None
+- name: validate.rules.gmp-operator.gmp-system.monitoring.googleapis.com
+  admissionReviewVersions:
+  - v1
+  clientConfig:
+    # caBundle populated by operator.
+    service:
+      name: gmp-operator
+      namespace: gmp-system
+      port: 443
+      path: /validate/monitoring.googleapis.com/v1/rules
+  failurePolicy: Fail
+  rules:
+  - resources:
+    - rules
+    apiGroups:
+    - monitoring.googleapis.com
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+  sideEffects: None
+- name: validate.clusterrules.gmp-operator.gmp-system.monitoring.googleapis.com
+  admissionReviewVersions:
+  - v1
+  clientConfig:
+    # caBundle populated by operator.
+    service:
+      name: gmp-operator
+      namespace: gmp-system
+      port: 443
+      path: /validate/monitoring.googleapis.com/v1/clusterrules
+  failurePolicy: Fail
+  rules:
+  - resources:
+    - clusterrules
+    apiGroups:
+    - monitoring.googleapis.com
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+  sideEffects: None
+- name: validate.globalrules.gmp-operator.gmp-system.monitoring.googleapis.com
+  admissionReviewVersions:
+  - v1
+  clientConfig:
+    # caBundle populated by operator.
+    service:
+      name: gmp-operator
+      namespace: gmp-system
+      port: 443
+      path: /validate/monitoring.googleapis.com/v1/globalrules
+  failurePolicy: Fail
+  rules:
+  - resources:
+    - globalrules
+    apiGroups:
+    - monitoring.googleapis.com
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+  sideEffects: None
+- name: validate.operatorconfigs.gmp-operator.gmp-system.monitoring.googleapis.com
+  admissionReviewVersions:
+  - v1
+  clientConfig:
+    # caBundle populated by operator.
+    service:
+      name: gmp-operator
+      namespace: gmp-system
+      port: 443
+      path: /validate/monitoring.googleapis.com/v1/operatorconfigs
+  failurePolicy: Fail
+  rules:
+  - resources:
+    - operatorconfigs
+    apiGroups:
+    - monitoring.googleapis.com
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+  sideEffects: None
