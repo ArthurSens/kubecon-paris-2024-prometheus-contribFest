@@ -17,7 +17,7 @@ bash cluster_create.sh
 
 This will create a 3-node workshop cluster called `kubecon2024-prometheus` and connect `kubectl` to that cluster.
 
-### Stage 0: Initial Step
+### Initial Stage (Stage 0)
 
 In the initial step we expect:
 
@@ -43,29 +43,32 @@ In the initial step we expect:
 
 * Metric collection... (TODO: Setup two Prometheus replicas in hashmod manually for users? How to do scale limit?)
 
-#### Step 0-1
+#### Stress Scenario
+
+1. Verify
 
 TODO: Tell user how to verify expected metric in the remote backend (alert, link to query? both?)
 
-#### Step 0-2
+2. Scale
 
 TODO: Scale replicas?
 
-#### Step 0-3
-
+3. Verify
+   
 TODO: See not all is monitored?
 
 ### Stage 1A: Prometheus Operator Stage
 
 TODO
 
+Do the [Stress Scenario](#stress-scenario)
+
 ### Stage 1B: GMP Operator Stage
-
-
-
-# Google Managed Service for Prometheus(GMP) Operator
 
 GMP operator allows you to globally monitor and alert on your workloads using Prometheus,
 all without the hassle of manually managing and operating Prometheus instances. GMP operator automatically scales to handle your data.
 
 TODO Ask user to deploy on their own just give basic hints? Tell them what to do without providing yamls?
+
+Do the [Stress Scenario](#stress-scenario)
+
