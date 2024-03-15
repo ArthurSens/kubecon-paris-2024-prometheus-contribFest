@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: avalanche
+  name: metric-source
   labels:
-    app: avalanche
+    app: metric-source
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: avalanche
+      app: metric-source
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -17,46 +17,46 @@ spec:
   template:
     metadata:
       labels:
-        app: avalanche
+        app: metric-source
     spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - avalanche
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - metric-source
+                topologyKey: kubernetes.io/hostname
       containers:
-      - image: quay.io/prometheuscommunity/avalanche:main
-        name: avalanche
-        imagePullPolicy: IfNotPresent
-        args:
-        - --metric-count=100
-        - --series-count=10
-        - --port=9001
-        ports:
-        - containerPort: 9001
-          protocol: TCP
-          name: metrics
-        resources: {}
+        - image: quay.io/prometheuscommunity/avalanche:main
+          name: avalanche
+          imagePullPolicy: IfNotPresent
+          args:
+            - --metric-count=100
+            - --series-count=10
+            - --port=9001
+          ports:
+            - containerPort: 9001
+              protocol: TCP
+              name: metrics
+          resources: {}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: avalanche
+  name: metric-source
   labels:
-    app: avalanche
+    app: metric-source
 spec:
   ports:
-  - name: metrics
-    port: 9001
-    protocol: TCP
-    targetPort: metrics
+    - name: metrics
+      port: 9001
+      protocol: TCP
+      targetPort: metrics
   selector:
-    app: avalanche
+    app: metric-source
   type: ClusterIP
