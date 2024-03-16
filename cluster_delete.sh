@@ -16,6 +16,6 @@ echo "OK!"
 
 if kind get clusters | grep -q "^${CLUSTER_NAME}$"
 then
-  kind delete cluster ${CLUSTER_NAME}
+  kind delete cluster -n ${CLUSTER_NAME}
 fi
 echo "# Cluster ${CLUSTER_NAME} is not running"
