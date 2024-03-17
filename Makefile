@@ -11,3 +11,6 @@ cluster-delete: ## Deletes the workshop cluster
 
 scenario-0: ## Deploy the scenario 0
 	@bash ./scripts/scenario_0.sh
+
+lint-shellcheck: ## Run shellcheck
+	bash ./scripts/shellcheck.sh
