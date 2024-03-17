@@ -41,7 +41,14 @@ In the initial step we expect:
   
   Confirm the Prometheus UI is accessible in your web browser at http://localhost:9090.
 
-* Metric collection... (TODO: Setup two Prometheus replicas in hashmod manually for users? How to do scale limit?)
+* Metric collection
+
+  ```bash
+  kubectl apply -f scenarios/0_initial/collectors.yaml
+  ```
+
+  Confirm Prometheus shards are running and targets are healthy
+  
 
 #### Stress Scenario
 
