@@ -4,6 +4,9 @@ metadata:
   name: prometheus
   namespace: prometheus-op-system
 spec:
+  podMonitorSelector:
+    matchLabels:
+       namespace: default
   shards: 2
   remoteWrite:
   - url: http://metric-backend.remote.svc:9090/api/v1/write
