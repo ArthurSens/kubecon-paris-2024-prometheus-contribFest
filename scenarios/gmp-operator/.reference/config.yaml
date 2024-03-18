@@ -1,0 +1,12 @@
+# Source: prometheus-engine/templates/operatorconfig.yaml
+apiVersion: monitoring.googleapis.com/v1
+kind: OperatorConfig
+metadata:
+  name: config
+  namespace: gmp-public
+collection:
+  externalLabels:
+    operator: gmp
+exports:
+- url: http://metric-backend.remote.svc:9090/api/v1/write
+

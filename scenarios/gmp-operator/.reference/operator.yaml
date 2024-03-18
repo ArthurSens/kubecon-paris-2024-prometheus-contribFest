@@ -606,14 +606,6 @@ webhooks:
     - UPDATE
   sideEffects: None
 ---
-# Source: prometheus-engine/templates/operatorconfig.yaml
-apiVersion: monitoring.googleapis.com/v1
-kind: OperatorConfig
-metadata:
-  name: config
-  namespace: gmp-public
-  labels:
----
 # Source: prometheus-engine/templates/validatingwebhookconfiguration.yaml
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration

@@ -30,13 +30,13 @@ In the initial step we expect:
 * Metric backend pod (Prometheus that receives remote-write and exposes UI) in the `remote` namespace running.
 
   ```bash
-  kubectl apply -n remote -f scenarios/0_initial/metric-remote-backend.yaml
+  kubectl apply -n remote -f scenarios/0_initial/metric-backend.yaml
   ```
 
   Verify Prometheus Receiver is running:
   
   ```bash
-  kubectl -n remote port-forward  deployment/prometheus-receiver 9090
+  kubectl -n remote port-forward svc/metric-backend 9090
   ```
   
   Confirm the Prometheus UI is accessible in your web browser at http://localhost:9090.

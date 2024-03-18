@@ -1,0 +1,13 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: metric-source
+  labels:
+    app: metric-source
+spec:
+  selector:
+    matchLabels:
+      app: metric-source
+  podMetricsEndpoints:
+  - port: metrics
+    interval: 15s
