@@ -30,3 +30,4 @@ fi
 
 CLUSTER_API_URL=$(kubectl config view --minify -o jsonpath="{.clusters[?(@.name == \"kind-${CLUSTER_NAME}\")].cluster.server}")
 echo "# Cluster is running, kubectl should point to the new cluster at ${CLUSTER_API_URL}"
+kubectl cluster-info
