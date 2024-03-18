@@ -121,7 +121,7 @@ function rc() {
 # p: print with next command.
 ##
 function p() {
-  PRINT_BUFFER+="${GREY}${1}${WHITE}"
+  PRINT_BUFFER+="${GREY}${1}${YELLOW}"
   PRINT_BUFFER+=$'\n'
 }
 
@@ -161,9 +161,9 @@ function navigate() {
     # Make sure input will not break the print.
     stty -echo
     if [[ -z $TYPE_SPEED ]]; then
-      echo -en "${prefix}${WHITE}$print${COLOR_RESET}"
+      echo -en "${prefix}${YELLOW}$print${COLOR_RESET}"
     else
-      echo -en "${prefix}${WHITE}$print${COLOR_RESET}" | pv -qL $[$TYPE_SPEED+(-2 + RANDOM%5)];
+      echo -en "${prefix}${YELLOW}$print${COLOR_RESET}" | pv -qL $[$TYPE_SPEED+(-2 + RANDOM%5)];
     fi
     stty echo
 

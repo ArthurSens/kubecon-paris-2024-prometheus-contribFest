@@ -1,3 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prom-op-system
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -45092,7 +45096,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-operator
-  namespace: prometheus-op-system
+  namespace: prom-op-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -45202,7 +45206,7 @@ metadata:
     app.kubernetes.io/name: prometheus-operator
     app.kubernetes.io/version: 0.72.0
   name: prometheus-operator
-  namespace: prometheus-op-system
+  namespace: prom-op-system
 spec:
   replicas: 1
   selector:
@@ -45221,6 +45225,7 @@ spec:
       automountServiceAccountToken: true
       containers:
       - args:
+        - --log-level=debug
         - --kubelet-service=kube-system/kubelet
         - --prometheus-config-reloader=quay.io/prometheus-operator/prometheus-config-reloader:v0.72.0
         env:
@@ -45262,7 +45267,7 @@ metadata:
     app.kubernetes.io/name: prometheus-operator
     app.kubernetes.io/version: 0.72.0
   name: prometheus-operator
-  namespace: prometheus-op-system
+  namespace: prom-op-system
 ---
 apiVersion: v1
 kind: Service
@@ -45272,7 +45277,7 @@ metadata:
     app.kubernetes.io/name: prometheus-operator
     app.kubernetes.io/version: 0.72.0
   name: prometheus-operator
-  namespace: prometheus-op-system
+  namespace: prom-op-system
 spec:
   clusterIP: None
   ports:

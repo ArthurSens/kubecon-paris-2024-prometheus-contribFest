@@ -2,7 +2,8 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: metric-source
-  namespace: default
+  labels:
+    app: metric-source
 spec:
   selector:
     matchLabels:
