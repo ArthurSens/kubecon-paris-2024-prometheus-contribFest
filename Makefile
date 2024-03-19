@@ -9,8 +9,5 @@ cluster-create: ## Bootstraps the workshop cluster
 cluster-delete: ## Deletes the workshop cluster
 	@bash ./scripts/cluster_delete.sh
 
-scenario-0: ## Deploy the scenario 0
-	@bash ./scripts/scenario_0.sh
-
 lint-shellcheck: ## Run shellcheck
 	bash ./scripts/shellcheck.sh
