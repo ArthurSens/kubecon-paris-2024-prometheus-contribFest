@@ -1,0 +1,17 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: prometheus-collector
+spec:
+  scaleTargetRef:
+    apiVersion:    monitoring.coreos.com/v1alpha1
+    kind:          PrometheusAgent
+    name:          collector
+  minReplicaCount:  1
+  maxReplicaCount:  10
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-receiver.remote.svc:9090
+      query: sum(rate(prometheus_tsdb_head_samples_appended_total[5m]))
+      threshold: '100.50'
