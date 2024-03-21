@@ -33,4 +33,14 @@ kind create cluster \
 CLUSTER_API_URL=$(kubectl config view --minify -o jsonpath="{.clusters[?(@.name == \"kind-${CLUSTER_NAME}\")].cluster.server}")
 printf "## Cluster is now running, kubectl should point to the new cluster at %s\n" "${CLUSTER_API_URL}"
 kubectl cluster-info
+
+printf "## Installing metrics-server %s\n"
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.7.0/components.yaml
+
+kubectl patch -n kube-system deployment metrics-server --type=json \
+  -p '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+
+print "## Instaling General Requirements"
+kubectl apply -f scenarios/0_initial
+
 exit 0
