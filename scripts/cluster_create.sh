@@ -34,16 +34,21 @@ CLUSTER_API_URL=$(kubectl config view --minify -o jsonpath="{.clusters[?(@.name 
 printf "## Cluster is now running, kubectl should point to the new cluster at %s\n" "${CLUSTER_API_URL}"
 kubectl cluster-info
 
-printf "## Installing metrics-server %s\n"
+printf "## Installing metrics-server\n"
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.7.0/components.yaml
 
 kubectl patch -n kube-system deployment metrics-server --type=json \
   -p '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
 
-printf "## Instaling General Requirements"
+printf "## Instaling General Requirements\n"
 kubectl apply -f scenarios/0_initial
 
-printf "## Instaling Prometheus Operator Requirements"
+printf "## Instaling Prometheus Operator Requirements\n"
 kubectl apply -f scenarios/prometheus-operator/requirements --server-side
+
+printf "## Waiting until all services are ready\n"
+kubectl wait --for=condition=ready pod -n remote -l app=metric-backend -l app=prometheus --timeout=10m
+kubectl wait --for=condition=ready pod -n monitoring -l app=prometheus --timeout=10m
+kubectl wait --for=condition=ready pod -n default -l app=metric-source --timeout=10m
 
 exit 0
