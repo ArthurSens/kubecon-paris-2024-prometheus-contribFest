@@ -40,7 +40,10 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/down
 kubectl patch -n kube-system deployment metrics-server --type=json \
   -p '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
 
-print "## Instaling General Requirements"
+printf "## Instaling General Requirements"
 kubectl apply -f scenarios/0_initial
+
+printf "## Instaling Prometheus Operator Requirements"
+kubectl apply -f scenarios/prometheus-operator/requirements --server-side
 
 exit 0
