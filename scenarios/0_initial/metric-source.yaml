@@ -5,7 +5,7 @@ metadata:
   labels:
     app: metric-source
 spec:
-  replicas: 2
+  replicas: 10
   selector:
     matchLabels:
       app: metric-source
@@ -36,8 +36,8 @@ spec:
           name: avalanche
           imagePullPolicy: IfNotPresent
           args:
-            - --metric-count=100
-            - --series-count=10
+            - --metric-count=1
+            - --series-count=100
             - --port=9001
           ports:
             - containerPort: 9001
