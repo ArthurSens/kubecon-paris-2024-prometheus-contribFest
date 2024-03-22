@@ -11,7 +11,7 @@ kubectl -n prometheus-op-system create -f scenarios/prometheus-operator/.referen
 1. <b>Install the Prometheus-Operator CRDs(Custom Resource Definitions)</b>:
 
 ```bash
-kubectl apply -f bundle.yaml
+kubectl apply --server-side -f bundle.yaml
 ```
 
 2. <b>Verify installation</b>: confirm the Prometheus-Operator pod have `running` status.
