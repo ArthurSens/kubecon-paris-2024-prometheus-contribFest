@@ -5,13 +5,13 @@ Reference guide, check it only if you are completely stuck or what to verify thi
 1. <b>Install the GMP CRDs(Custom Resource Definitions)</b>:
 
    ```bash
-   kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/prometheus-engine/macxamin/export-write/manifests/setup.yaml
+   kubectl apply -f kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/prometheus-engine/main/manifests/setup.yaml
    ```
 
 2. <b>Install the GMP operator</b>:
 
    ```bash
-   kubectl apply -f operator.yaml
+   kubectl apply -f scenarios/gmp-operator/.reference/operator.yaml
    ```
 
 3. <b>Verify installation</b>: confirm pods have `running` status.
