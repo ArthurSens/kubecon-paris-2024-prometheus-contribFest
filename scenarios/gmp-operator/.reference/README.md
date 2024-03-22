@@ -26,7 +26,7 @@ Reference guide, check it only if you are completely stuck or what to verify thi
 1. <b>Apply a PodMonitoring</b>: PodMonitoring's tell the Prometheus collectors what to scrape.
 
    ```bash
-   kubectl apply -n gmp-system -f self-podmonitoring.yaml
+   kubectl apply -n gmp-system -f scenarios/gmp-operator/.reference/metric-source-podmonitoring.yaml
    ```
 
 3. <b>Verify Configuration:</b> Check the Prometheus config file to confirm job exists.
@@ -40,18 +40,11 @@ Reference guide, check it only if you are completely stuck or what to verify thi
 1. <b>Edit the Operator Config:</b>
 
    ```bash
-   kubectl -n gmp-public edit operatorconfig config
-   ```
-
-3. <b>Add Export Configuration:</b> Insert the following code block into your configuration file to specify the target destination for GMP collector write requests:
-
-   ```bash
-   exports:
-       - url: http://prometheus-receiver.prometheus-receiver.svc:9090/api/v1/write
+      kubectl apply -n gmp-public -f scenarios/gmp-operator/.reference/config.yaml
    ```
 
 4. <b>Verify your metrics:</b>
 - Access the Prometheus Receiver UI at http://localhost:9090.
-- Confirm that metrics collected by GMP are visible.
+- Confirm that metrics collected by GMP are visible. Should have the label `operator` set to `gmp`
 
 
