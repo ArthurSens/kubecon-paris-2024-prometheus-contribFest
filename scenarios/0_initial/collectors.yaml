@@ -111,7 +111,6 @@ data:
           namespaces:
             names:
             - default
-        sample_limit: 1500
         relabel_configs:    
           - source_labels: [__meta_kubernetes_service_label_app, __meta_kubernetes_service_labelpresent_app]
             separator: ;
@@ -147,7 +146,7 @@ data:
             target_label: __tmp_hashmod
           - action: keep
             source_labels: [__tmp_hashmod]
-            regex: 1
+            regex: ^0$
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -247,7 +246,7 @@ data:
             target_label: __tmp_hashmod
           - action: keep
             source_labels: [__tmp_hashmod]
-            regex: 2
+            regex: ^1$
 ---
 apiVersion: v1
 kind: Service
