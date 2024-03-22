@@ -43,9 +43,6 @@ kubectl patch -n kube-system deployment metrics-server --type=json \
 printf "## Instaling General Requirements\n"
 kubectl apply -f scenarios/0_initial
 
-printf "## Instaling Prometheus Operator Requirements\n"
-kubectl apply -f scenarios/prometheus-operator/requirements --server-side
-
 printf "## Waiting until all services are ready\n"
 kubectl wait --for=condition=ready pod -n remote -l app=metric-backend --timeout=10m
 kubectl wait --for=condition=ready pod -n monitoring -l app=prometheus --timeout=10m
