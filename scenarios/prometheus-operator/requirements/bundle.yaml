@@ -51348,7 +51348,7 @@ automountServiceAccountToken: true
 kind: ServiceAccount
 metadata:
   name: promagent-collector
-  namespace: default
+  namespace: prometheus-op-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -51377,13 +51377,13 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: promagent-collector
-    namespace: default
+    namespace: prometheus-op-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: promagent-collector-config
-  namespace: default
+  namespace: prometheus-op-system
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -51391,13 +51391,13 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: promagent-collector
-    namespace: default
+    namespace: prometheus-op-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: promagent-collector-config
-  namespace: default
+  namespace: prometheus-op-system
 rules:
   - apiGroups:
       - ""
@@ -51412,7 +51412,7 @@ items:
     kind: RoleBinding
     metadata:
       name: promagent-collector
-      namespace: default
+      namespace: prometheus-op-system
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: Role
@@ -51420,7 +51420,7 @@ items:
     subjects:
       - kind: ServiceAccount
         name: promagent-collector
-        namespace: default
+        namespace: prometheus-op-system
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
     metadata:
@@ -51433,7 +51433,7 @@ items:
     subjects:
       - kind: ServiceAccount
         name: promagent-collector
-        namespace: default
+        namespace: prometheus-op-system
 kind: RoleBindingList
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -51442,7 +51442,7 @@ items:
     kind: Role
     metadata:
       name: promagent-collector
-      namespace: default
+      namespace: prometheus-op-system
     rules:
       - apiGroups:
           - ""
