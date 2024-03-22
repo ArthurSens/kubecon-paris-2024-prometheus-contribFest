@@ -8,7 +8,7 @@ metadata:
 spec:
   serviceAccountName: promagent-collector
   image: quay.io/prometheus/prometheus:v2.50.1
-  podMonitorNamespaceSelector: null
+  podMonitorNamespaceSelector: {}
   podMonitorSelector:
     matchLabels:
       app: metric-source
@@ -27,7 +27,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: metric-source
-  namespace: prometheus-op-system
+  namespace: default
   labels:
     app: metric-source
 spec:
