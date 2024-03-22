@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Default values
-DEFAULT_METRIC_COUNT=1
+DEFAULT_METRIC_COUNT=100
 DEFAULT_SERIES_COUNT=10
 
 # Check if metric count is provided

@@ -109,6 +109,7 @@ data:
           namespaces:
             names:
             - default
+        sample_limit: 15000
         relabel_configs:    
           - source_labels: [__meta_kubernetes_service_label_app, __meta_kubernetes_service_labelpresent_app]
             separator: ;
