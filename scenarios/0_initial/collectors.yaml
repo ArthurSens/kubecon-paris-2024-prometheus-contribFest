@@ -99,6 +99,8 @@ data:
     global:
       scrape_interval: 15s
       evaluation_interval: 15s
+      external_labels:
+        operator: none
     remote_write:
       - url: "http://metric-backend.remote.svc:9090/api/v1/write"
     scrape_configs:
@@ -199,6 +201,8 @@ data:
     global:
       scrape_interval: 15s
       evaluation_interval: 15s
+      external_labels:
+        operator: none
     remote_write:
       - url: "http://metric-backend.remote.svc:9090/api/v1/write"
     scrape_configs:
