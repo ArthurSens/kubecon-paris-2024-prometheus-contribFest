@@ -8,6 +8,7 @@ metadata:
 spec:
   serviceAccountName: promagent-collector
   image: quay.io/prometheus/prometheus:v2.50.1
+  podMonitorNamespaceSelector: null
   podMonitorSelector:
     matchLabels:
       app: metric-source
