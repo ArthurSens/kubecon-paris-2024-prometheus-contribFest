@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1alpha1
 kind: PrometheusAgent
 metadata:
   name: collector
-  namespace: default
+  namespace: prometheus-op-system
   labels:
     prometheus: collector
 spec:
@@ -22,4 +22,17 @@ spec:
   remoteWrite:
     - url: http://prometheus-receiver.remote.svc:9090/api/v1/write
 ---
-
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: metric-source
+  namespace: prometheus-op-system
+  labels:
+    app: metric-source
+spec:
+  selector:
+    matchLabels:
+      app: metric-source
+  podMetricsEndpoints:
+    - port: metrics
+      interval: 15s
