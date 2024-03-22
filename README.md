@@ -8,7 +8,7 @@ Slides: https://docs.google.com/presentation/d/1ERc2DJZBIp6UcL_vtAQocBjbiSxgMw00
 
 > NOTE: If you have any problem with any scenario, check reference configuration [Prometheus Operator](scenarios/prometheus-operator/.reference), [GMP Operator](scenarios/gmp-operator/.reference) made by us (don't cheat!) (:
 
-### Start your cluster
+### Initial Stage
 
 You'll need `go`, `docker`, `kind` and `kubectl` installed. Once you get there simply
 run:
@@ -19,24 +19,14 @@ make cluster-create
 
 This will create a 3-node workshop cluster called `kubecon2024-prometheus` and connect `kubectl` to that cluster.
 
-### Initial Stage (Stage 0)
+This will also run initial scenario (`kubectl apply -f scenarios/0_initial`):
 
-In the initial step we expect:
-
-* Metric source pods (avalanche) in the `default` namespace running.
-
-  ```bash
-  kubectl apply -f scenarios/0_initial/metric-source.yaml
-  ```
-  We should have 10 replicas of avalanche running across nodes.
-
+* Metric source pods (avalanche) in the `default` namespace running (10 replicas)
+* 2 Prometheus hashmod without operator in `monitoring` namespace scraping metric source pods
 * Metric backend pod (Prometheus that receives remote-write and exposes UI) in the `remote` namespace running.
+  * NOTE: Remote write endpoint will be available in the cluster under `http://metric-backend.remote.svc:9090/api/v1/write` URL.
 
-  ```bash
-  kubectl apply -n remote -f scenarios/0_initial/metric-backend.yaml
-  ```
-
-  Verify Prometheus Receiver is running:
+You can verify Prometheus Receiver is running and have metric source metrics:
   
   ```bash
   kubectl -n remote port-forward svc/metric-backend 9090
@@ -44,17 +34,9 @@ In the initial step we expect:
   
   Confirm the Prometheus UI is accessible in your web browser at http://localhost:9090.
 
-* Initial metric collection
+### Stress Scenario
 
-  ```bash
-  kubectl apply -f scenarios/0_initial/collectors.yaml
-  ```
-
-  Confirm Prometheus shards are running and targets are healthy.
-
-#### Stress Scenario
-
-Here we simulate more applications, so more metrics needed to be collected in
+Here we can simulate running more applications, so more metrics needed to be collected in
 the cluster. We won't break collection/OOM Prometheus with only 10 to 15 replica
 increase, but imagine this won't fit in 2 Prometheus replicas you might have.
 
@@ -85,13 +67,13 @@ Forward traffic again to remote backend:
 
 Query for e.g. `sum(up) by (instance, pod, operator)` on http://localhost:9090.
 
-
 ### Stage 1A: Prometheus Operator Stage
 
 Before you start (especially if you ran GMP Operator stage already):
 
-* Ensure no `gmp-system` and `gmp-public` namespace `kubectl delete namespace gmp-system` and `kubectl delete namespace gmp-public`
-* Scale back to 10 replicas `kubectl scale deployment/metric-source --replicas=10`
+* (opt) Ensure no `monitorig` namespace `kubectl delete namespace monitoring`
+* (opt) Ensure no `gmp-system` and `gmp-public` namespace `kubectl delete namespace gmp-system` and `kubectl delete namespace gmp-public`
+* Scale back (if you need) to 10 replicas `kubectl scale deployment/metric-source --replicas=10`
 
 From high level, to run Prometheus Operator in auto-scaling hashmod mode you
 need a few things:
@@ -127,9 +109,8 @@ Do the [Stress Scenario](#stress-scenario) to check if it auto-scales!
 
 Before you start (if you ran Prometheus Operator stage already):
 
-* Ensure no `prometheus-op-system` namespace `kubectl delete namespace prometheus-op-system`
-* Scale back to 10 replicas `kubectl scale deployment/metric-source --replicas=10`
-* "Remove" one node `kubectl cordon kubecon2024-prometheus-worker3`
+* (opt) Ensure no `prometheus-op-system` namespace `kubectl delete namespace prometheus-op-system`
+* Scale back (if you need) to 10 replicas `kubectl scale deployment/metric-source --replicas=10`
 
 GMP operator allows you to globally monitor and alert on your workloads using Prometheus,
 all without the hassle of manually managing and operating Prometheus instances. GMP operator automatically scales to handle your data.
@@ -169,7 +150,9 @@ collected by remote backend:
 
 Query for e.g. `sum(up) by (instance, pod, operator)` on http://localhost:9090.
 
-Do the [Stress Scenario](#stress-scenario), but when you add more series, "add"
-more node (simulated by uncordon) `kubectl uncordon kubecon2024-prometheus-worker3`.
+You should see all avalanche metrics and you see 3 Prometheus collectors.
 
-Then confirm you see all avalanche metrics and you see 3 Prometheus collectors.
+We don't need to stress... as we can't automatically add/remove nodes on kind, but GMP operator
+would ensure Prometheus collection scales with number of nodes.
+
+

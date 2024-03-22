@@ -40,7 +40,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/down
 kubectl patch -n kube-system deployment metrics-server --type=json \
   -p '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
 
-printf "## Instaling General Requirements\n"
+printf "## Installing General Requirements\n"
 kubectl apply -f scenarios/0_initial
 
 printf "## Waiting until all services are ready\n"

@@ -101,6 +101,7 @@ data:
       evaluation_interval: 15s
       external_labels:
         operator: none
+        source: shard-1
     remote_write:
       - url: "http://metric-backend.remote.svc:9090/api/v1/write"
     scrape_configs:
@@ -203,6 +204,7 @@ data:
       evaluation_interval: 15s
       external_labels:
         operator: none
+        source: shard-2
     remote_write:
       - url: "http://metric-backend.remote.svc:9090/api/v1/write"
     scrape_configs:
