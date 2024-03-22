@@ -13,6 +13,7 @@ Reference guide, check it only if you are completely stuck or what to verify thi
    ```bash
    kubectl apply -f scenarios/gmp-operator/.reference/operator.yaml
    ```
+   > For this contribFest we're using the latest image of gmp-operator, which is not released yet. Usually you would apply https://raw.githubusercontent.com/GoogleCloudPlatform/prometheus-engine/main/manifests/operator.yaml
 
 3. <b>Verify installation</b>: confirm pods have `running` status.
 
