@@ -36,7 +36,7 @@ spec:
           name: avalanche
           imagePullPolicy: IfNotPresent
           args:
-            - --metric-count=1
+            - --metric-count=100
             - --series-count=10
             - --port=9001
           ports:
