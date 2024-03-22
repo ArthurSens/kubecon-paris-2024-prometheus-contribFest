@@ -12,7 +12,7 @@ You'll need `go`, `docker`, `kind` and `kubectl` installed. Once you get there s
 run:
 
 ```sh 
-bash cluster_create.sh
+make cluster-create
 ```
 
 This will create a 3-node workshop cluster called `kubecon2024-prometheus` and connect `kubectl` to that cluster.
