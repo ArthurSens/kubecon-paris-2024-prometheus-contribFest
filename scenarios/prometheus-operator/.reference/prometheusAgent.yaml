@@ -8,6 +8,8 @@ metadata:
 spec:
   serviceAccountName: promagent-collector
   image: quay.io/prometheus/prometheus:v2.50.1
+  externalLabels:
+    operator: prometheus-operator
   podMonitorNamespaceSelector: {}
   podMonitorSelector:
     matchLabels:
@@ -21,7 +23,7 @@ spec:
       cpu: "200m"
   shards: 2
   remoteWrite:
-    - url: http://prometheus-receiver.remote.svc:9090/api/v1/write
+    - url: http://metric-backend.remote.svc:9090/api/v1/write
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
