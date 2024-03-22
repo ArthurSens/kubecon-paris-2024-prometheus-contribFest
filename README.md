@@ -85,7 +85,7 @@ additional component called [KEDA](https://keda.sh/) for the horizontal pod auto
 It also setups Prometheus Operator in `prometheus-op-system` namespace.
 
   ```bash
-  kubectl apply -f scenario/prometheus-operator/requirements/bundle.yaml
+  kubectl apply --server-side -f scenarios/prometheus-operator/requirements/bundle.yaml
   ```
 
 * Create and apply [`PrometheusAgent` Custom Resource](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1alpha1.PrometheusAgent) with remote
