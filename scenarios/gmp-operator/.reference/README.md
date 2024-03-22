@@ -5,7 +5,7 @@ Reference guide, check it only if you are completely stuck or what to verify thi
 1. <b>Install the GMP CRDs(Custom Resource Definitions)</b>:
 
    ```bash
-   kubectl apply -f kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/prometheus-engine/main/manifests/setup.yaml
+   kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/prometheus-engine/main/manifests/setup.yaml
    ```
 
 2. <b>Install the GMP operator</b>:
@@ -44,7 +44,9 @@ Reference guide, check it only if you are completely stuck or what to verify thi
    ```
 
 4. <b>Verify your metrics:</b>
-- Access the Prometheus Receiver UI at http://localhost:9090.
+```bash
+   kubectl port-forward -n remote svc/metric-backend 9090
+```
 - Confirm that metrics collected by GMP are visible. Should have the label `operator` set to `gmp`
 
 
