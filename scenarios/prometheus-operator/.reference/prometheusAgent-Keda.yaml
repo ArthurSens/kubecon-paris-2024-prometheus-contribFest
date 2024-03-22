@@ -2,6 +2,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: prometheus-collector
+  namespace: prometheus-op-system
 spec:
   scaleTargetRef:
     apiVersion:    monitoring.coreos.com/v1alpha1
@@ -12,6 +13,6 @@ spec:
   triggers:
   - type: prometheus
     metadata:
-      serverAddress: http://prometheus-receiver.remote.svc:9090
-      query: sum(rate(prometheus_tsdb_head_samples_appended_total[5m]))
-      threshold: '100.50'
+      serverAddress: http://metric-backend.remote.svc:9090
+      query: count(up)
+      threshold: '2'
