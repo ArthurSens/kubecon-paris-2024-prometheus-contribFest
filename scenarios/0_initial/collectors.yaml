@@ -113,7 +113,7 @@ data:
         relabel_configs:    
           - source_labels: [__meta_kubernetes_service_label_app, __meta_kubernetes_service_labelpresent_app]
             separator: ;
-            regex: (avalanche);true
+            regex: (metric-source);true
             replacement: $1
             action: keep
           - source_labels: [__meta_kubernetes_endpoint_port_name]
@@ -211,7 +211,7 @@ data:
         relabel_configs:    
           - source_labels: [__meta_kubernetes_service_label_app, __meta_kubernetes_service_labelpresent_app]
             separator: ;
-            regex: (avalanche);true
+            regex: (metric-source);true
             replacement: $1
             action: keep
           - source_labels: [__meta_kubernetes_endpoint_port_name]
